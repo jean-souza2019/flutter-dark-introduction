@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -26,14 +27,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
-
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   List<Language> languages = [];
 
   @override
@@ -42,32 +40,29 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text("Minhas Linguagens"),
         actions: [
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: _goToNewLanguage)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: languages.isNotEmpty
+                ? IconButton(
+                    icon: Icon(Icons.remove), onPressed: _gotRemoveLanguage)
+                : Container(),
+          ),
+          IconButton(icon: Icon(Icons.add), onPressed: _goToNewLanguage)
         ],
       ),
       body: Column(
         children: <Widget>[
-          Wrap(
-            spacing: 10,
-            children: buildChips()
-          ),
+          Wrap(spacing: 10, children: buildChips()),
           Expanded(
-            child: ListView(
-                children: buildListItens()
-            ),
+            child: ListView(children: buildListItens()),
           ),
         ],
       ),
     );
   }
 
-  void _goToNewLanguage(){
-    Future future = Navigator.pushNamed(
-      context,
-      "/add"
-    );
+  void _goToNewLanguage() {
+    Future future = Navigator.pushNamed(context, "/add");
     future.then((language) {
       setState(() {
         languages.add(language);
@@ -75,31 +70,33 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  List<ChoiceChip> buildChips(){
-    return languages.map((language) => ChoiceChip(
-        label: Text(language.name),
-        selected: language.selected,
-        onSelected: (value) {
-          setState(() {
-            language.selected = value;
-          });
-        },
-      ),
-    ).toList();
+  void _gotRemoveLanguage() {
+    setState(() {
+      languages.clear();
+    });
   }
 
-  List<Widget> buildListItens(){
+  List<ChoiceChip> buildChips() {
+    return languages
+        .map(
+          (language) => ChoiceChip(
+            label: Text(language.name),
+            selected: language.selected,
+            onSelected: (value) {
+              setState(() {
+                language.selected = value;
+              });
+            },
+          ),
+        )
+        .toList();
+  }
+
+  List<Widget> buildListItens() {
     return languages
         .where((language) => language.selected)
         .map((language) =>
-          getItemList(
-              language.name,
-              language.detail
-          )
-        )
+            getItemList(language.name, language.detail, language.plataforma))
         .toList();
-
   }
-
-
 }
